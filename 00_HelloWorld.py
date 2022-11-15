@@ -12,12 +12,12 @@
 
 # TensorFlow and tf.keras
 import tensorflow as tf
-
 print("TensorFlow version:", tf.__version__, "\n")
 
-import matplotlib.pyplot as plt
 # Helper libraries
 import numpy as np
+import matplotlib.pyplot as plt
+
 
 # Image categories
 class_names = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine']
@@ -25,9 +25,9 @@ class_names = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'E
 # Early cancellation when reached certain level of accuracy
 class classCallback(tf.keras.callbacks.Callback):
   def on_epoch_end(self, epoch, logs={}):
-    if(logs.get('accuracy')>0.9):
-      print("\n\nReached 90% accuracy so cancelling training!")
-      # self.model.stop_training = True
+    if(logs.get('accuracy')>0.95):
+      print("\n\nReached 95% accuracy so cancelling training!")
+      self.model.stop_training = True
 
 def main():
     # Create object mnist 
