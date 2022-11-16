@@ -34,10 +34,12 @@ class classCallback(tf.keras.callbacks.Callback):
 def create_model():
     # Create model
     model = tf.keras.models.Sequential([
-        tf.keras.layers.Flatten(input_shape=(28, 28)),    # 784 = 28 x 28   0
+        # 784 = 28 x 28   0
+        tf.keras.layers.Flatten(input_shape=(28, 28)),    
         # 128             784 x 128 + 128
         tf.keras.layers.Dense(128, activation='relu'),
-        tf.keras.layers.Dropout(0.2),                     # 128             0
+         # 128             0
+        tf.keras.layers.Dropout(0.2),                    
         # 10              128 x 10 + 10
         tf.keras.layers.Dense(10)
     ])
