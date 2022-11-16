@@ -1,4 +1,14 @@
-https://www.tensorflow.org/tutorials
+#
+# 00_HelloWorld.py
+#
+# - Load a prebuilt dataset
+# - Build a neural network machine learning model that classifies image numbers
+# - Train this neural network
+# - Evaluate the accuracy of the model
+#
+# Full explanation at:
+# https://www.tensorflow.org/tutorials/keras/classification#build_the_model
+#
 
 
 

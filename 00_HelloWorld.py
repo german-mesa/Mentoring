@@ -6,9 +6,6 @@
 # - Train this neural network
 # - Evaluate the accuracy of the model
 #
-# Full explanation at:
-# https://www.tensorflow.org/tutorials/keras/classification#build_the_model
-#
 
 # TensorFlow and tf.keras
 import tensorflow as tf
