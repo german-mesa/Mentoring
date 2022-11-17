@@ -1,5 +1,5 @@
 #
-# 00_HelloWorld.py
+# 00_Hello_World.py
 #
 # - Load a prebuilt dataset
 # - Build a neural network machine learning model that classifies image numbers
@@ -89,7 +89,7 @@ def main():
     # Evaluate test dataset
     print("\nEvaluate test dataset")
     test_loss, test_acc = model.evaluate(x_test,  y_test, verbose=2)
-    print(f'\nTest accuracy: {test_acc * 100}%')
+    print("\nTest accuracy: {:5.2f}%".format(100 * test_acc))
 
     # Predictions over test image dataset
     probability_model = tf.keras.Sequential([model, tf.keras.layers.Softmax()])
