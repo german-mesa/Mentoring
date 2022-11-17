@@ -92,6 +92,9 @@ def main():
     probability_model = tf.keras.Sequential([model, tf.keras.layers.Softmax()])
     predictions = probability_model.predict(x_test)
 
+    # Save the entire model to a HDF5 file.
+    # The '.h5' extension indicates that the model should be saved to HDF5.
+    model.save(os.path.join(os.getcwd(), "models", "mnist.h5"))
 
 #
 # Start program
