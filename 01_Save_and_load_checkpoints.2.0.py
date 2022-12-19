@@ -13,6 +13,17 @@ import matplotlib.pyplot as plt
 
 
 #
+# Create a callback that saves the model's weights
+#
+checkCallback = tf.keras.callbacks.ModelCheckpoint(
+    filepath=os.path.join(os.getcwd(), "training", "cp.ckpt"),
+    save_weights_only=True,
+    verbose=1
+)
+
+callbacks = [checkCallback]
+
+#
 # Image normalization
 #
 def normalize_img(image, label):
@@ -34,6 +45,11 @@ def main():
     )
 
     # Build training pipeline
+    # - tf.data.Dataset.map     : TFDS provide images of type tf.uint8, while the model expects tf.float32. Therefore, you need to normalize images.
+    # - tf.data.Dataset.cache   : As you fit the dataset in memory, cache it before shuffling for a better performance.
+    # - tf.data.Dataset.shuffle : For true randomness, set the shuffle buffer to the full dataset size.
+    # - tf.data.Dataset.batch   : Batch elements of the dataset after shuffling to get unique batches at each epoch.
+    # - tf.data.Dataset.prefetch: It is good practice to end the pipeline by prefetching for performance.
     ds_train = ds_train.map(normalize_img, num_parallel_calls=tf.data.AUTOTUNE)
     ds_train = ds_train.cache()
     ds_train = ds_train.shuffle(ds_info.splits['train'].num_examples)
@@ -71,7 +87,8 @@ def main():
     history =  model.fit(
         ds_train,
         epochs=10,
-        validation_data=ds_test
+        validation_data=ds_test,
+        callbacks=callbacks
     )
     
     # Plot loss & accuracy
@@ -90,7 +107,8 @@ def main():
     plt.show()
 
     # Save the entire model to a HDF5 file.
-    model.save(os.path.join(os.getcwd(), "models", "mnist.h5"))
+    if input("\nPush <y> to save the entire model: ") == 'y':
+        model.save(os.path.join(os.getcwd(), "models", "mnist.h5"))
 
 #
 # Start program
