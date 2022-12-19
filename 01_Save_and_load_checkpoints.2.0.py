@@ -69,9 +69,13 @@ def main():
         tf.keras.layers.Dense(10)
     ])
 
+    # Compile the model
+    # Loss function             : This measures how accurate the model is during training. You want to minimize this function to "steer" the model in the right direction.
+    # Optimizer                 : This is how the model is updated based on the data it sees and its loss function.
+    # Metrics                   : Used to monitor the training and testing steps. The following example uses accuracy, the fraction of the images that are correctly classified.
     model.compile(
-        optimizer=tf.keras.optimizers.Adam(0.001),
         loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+        optimizer=tf.keras.optimizers.Adam(0.001),
         metrics=[tf.keras.metrics.SparseCategoricalAccuracy()],
     )
 
