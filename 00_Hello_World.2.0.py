@@ -15,11 +15,14 @@ import matplotlib.pyplot as plt
 #
 # Early cancellation when reached certain level of accuracy
 #
-class classCallback(tf.keras.callbacks.Callback):
+class cancelCallback(tf.keras.callbacks.Callback):
     def on_epoch_end(self, epoch, logs={}):
         if (logs.get('sparse_categorical_accuracy') > 0.99):
             print("\n\nReached 99% accuracy so cancelling training!")
             self.model.stop_training = True
+
+
+callbacks = [cancelCallback]
 
 #
 # Image normalization
@@ -92,7 +95,7 @@ def main():
         ds_train,
         epochs=10,
         validation_data=ds_test,
-        callbacks=[classCallback()]
+        callbacks=callbacks
     )
     
     # Plot loss & accuracy
