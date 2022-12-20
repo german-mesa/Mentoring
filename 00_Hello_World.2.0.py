@@ -34,6 +34,7 @@ def normalize_img(image, label):
 #
 def main():
     # Load dataset
+    # https://www.tensorflow.org/datasets/catalog/mnist
     (ds_train, ds_test), ds_info = tfds.load(
         'mnist',
         split=['train', 'test'],
@@ -42,7 +43,18 @@ def main():
         with_info=True,
     )
 
+    # Show some examples
+    tfds.visualization.show_examples(
+        ds_train,
+        ds_info
+    )
+
     # Build training pipeline
+    # - tf.data.Dataset.map     : TFDS provide images of type tf.uint8, while the model expects tf.float32. Therefore, you need to normalize images.
+    # - tf.data.Dataset.cache   : As you fit the dataset in memory, cache it before shuffling for a better performance.
+    # - tf.data.Dataset.shuffle : For true randomness, set the shuffle buffer to the full dataset size.
+    # - tf.data.Dataset.batch   : Batch elements of the dataset after shuffling to get unique batches at each epoch.
+    # - tf.data.Dataset.prefetch: It is good practice to end the pipeline by prefetching for performance.
     ds_train = ds_train.map(normalize_img, num_parallel_calls=tf.data.AUTOTUNE)
     ds_train = ds_train.cache()
     ds_train = ds_train.shuffle(ds_info.splits['train'].num_examples)
@@ -62,6 +74,10 @@ def main():
         tf.keras.layers.Dense(10)
     ])
 
+    # Compile the model
+    # Loss function             : This measures how accurate the model is during training. You want to minimize this function to "steer" the model in the right direction.
+    # Optimizer                 : This is how the model is updated based on the data it sees and its loss function.
+    # Metrics                   : Used to monitor the training and testing steps. The following example uses accuracy, the fraction of the images that are correctly classified.
     model.compile(
         optimizer=tf.keras.optimizers.Adam(0.001),
         loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),

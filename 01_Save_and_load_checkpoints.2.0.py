@@ -35,6 +35,7 @@ def normalize_img(image, label):
 #
 def main():
     # Load dataset
+    # https://www.tensorflow.org/datasets/catalog/mnist
     (ds_train, ds_test), ds_info = tfds.load(
         'mnist',
         split=['train', 'test'],
