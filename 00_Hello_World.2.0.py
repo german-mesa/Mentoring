@@ -46,6 +46,9 @@ def main():
         with_info=True,
     )
 
+    # Check that we have data    
+    assert isinstance(ds_train, tf.data.Dataset)
+
     # Show some examples
     tfds.visualization.show_examples(
         ds_train,

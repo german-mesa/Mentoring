@@ -44,6 +44,15 @@ def main():
         with_info=True,
     )
 
+    # Check that we have data    
+    assert isinstance(ds_train, tf.data.Dataset)
+
+    # Show some examples
+    tfds.visualization.show_examples(
+        ds_train,
+        ds_info
+    )
+
     # Build training pipeline
     # - tf.data.Dataset.map     : TFDS provide images of type tf.uint8, while the model expects tf.float32. Therefore, you need to normalize images.
     # - tf.data.Dataset.cache   : As you fit the dataset in memory, cache it before shuffling for a better performance.
