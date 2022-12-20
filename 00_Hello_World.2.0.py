@@ -17,12 +17,12 @@ import matplotlib.pyplot as plt
 #
 class cancelCallback(tf.keras.callbacks.Callback):
     def on_epoch_end(self, epoch, logs={}):
-        if (logs.get('sparse_categorical_accuracy') > 0.99):
-            print("\n\nReached 99% accuracy so cancelling training!")
+        if (logs.get('sparse_categorical_accuracy') > 0.95):
+            print("\n\nReached 95% accuracy so cancelling training!")
             self.model.stop_training = True
 
 
-callbacks = [cancelCallback]
+callbacks = [cancelCallback()]
 
 #
 # Image normalization

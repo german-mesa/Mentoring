@@ -20,7 +20,14 @@ checkCallback = tf.keras.callbacks.ModelCheckpoint(
     verbose=1
 )
 
-callbacks = [checkCallback]
+class cancelCallback(tf.keras.callbacks.Callback):
+    def on_epoch_end(self, epoch, logs={}):
+        if (logs.get('sparse_categorical_accuracy') > 0.99):
+            print("\n\nReached 99% accuracy so cancelling training!")
+            self.model.stop_training = True
+
+
+callbacks = [checkCallback, cancelCallback()]
 
 #
 # Image normalization
