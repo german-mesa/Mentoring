@@ -1,7 +1,6 @@
 # TensorFlow and tf.keras
 # https://www.tensorflow.org/datasets/keras_example
-# https://matplotlib.org/
-#
+
 import tensorflow as tf
 import tensorflow_datasets as tfds
 
@@ -102,6 +101,7 @@ def main():
     )
     
     # Plot loss & accuracy
+    # https://matplotlib.org/
     fig, axs = plt.subplots(2, 1, sharex=True)
     fig.suptitle('Model Loss & Accuracy')
 

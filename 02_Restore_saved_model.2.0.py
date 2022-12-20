@@ -53,7 +53,6 @@ def main():
     model = tf.keras.models.load_model(os.path.join(os.getcwd(), "models", "mnist.h5"))
  
     # Predictions over test image dataset
-    # https://www.tensorflow.org/tutorials/customization/custom_training_walkthrough
     probability_model = tf.keras.Sequential([model, tf.keras.layers.Softmax()])
     predictions = model.predict(ds_test, batch_size=128)
 
