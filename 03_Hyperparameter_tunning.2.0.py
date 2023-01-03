@@ -1,4 +1,4 @@
-# TensorFlow hyperparameter tunning
+# TensorFlow hyperparameter tunning - Work in progress
 # https://www.tensorflow.org/tutorials/keras/keras_tuner#instantiate_the_tuner_and_perform_hypertuning
 
 import tensorflow as tf
@@ -7,7 +7,7 @@ import tensorflow_datasets as tfds
 print("TensorFlow version:", tf.__version__, "\n")
 
 # Helper libraries
-import numpy as np
+import keras.backend as kb
 import keras_tuner as kt
 import matplotlib.pyplot as plt
 
@@ -25,6 +25,19 @@ callbacks = [earlyStopping]
 def normalize_img(image, label):
   """Normalizes images: `uint8` -> `float32`."""
   return tf.cast(image, tf.float32) / 255., label
+
+
+#
+# Make iterator
+#
+def make_iterator(dataset):
+    iterator = dataset.make_one_shot_iterator()
+    next_val = iterator.get_next()
+
+    with kb.get_session().as_default() as sess:
+        while True:
+            *inputs, labels = sess.run(next_val)
+            yield inputs, labels
 
 
 def createModel(hp):
@@ -62,11 +75,38 @@ def createModel(hp):
 # Main flow
 #
 def main():
-    # Load mnist dataset
-    (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
+    # Load dataset
+    # https://www.tensorflow.org/datasets/catalog/mnist
+    (ds_train, ds_test), ds_info = tfds.load(
+        'mnist',
+        split=['train', 'test'],
+        shuffle_files=True,
+        as_supervised=True,
+        with_info=True,
+    )
 
-    # Normalize data for better convergence
-    x_train, x_test = x_train / 255.0, x_test / 255.0
+    # Check that we have data    
+    assert isinstance(ds_train, tf.data.Dataset)
+
+    # Build training pipeline
+    # - tf.data.Dataset.map     : TFDS provide images of type tf.uint8, while the model expects tf.float32. Therefore, you need to normalize images.
+    # - tf.data.Dataset.cache   : As you fit the dataset in memory, cache it before shuffling for a better performance.
+    # - tf.data.Dataset.shuffle : For true randomness, set the shuffle buffer to the full dataset size.
+    # - tf.data.Dataset.batch   : Batch elements of the dataset after shuffling to get unique batches at each epoch.
+    # - tf.data.Dataset.prefetch: It is good practice to end the pipeline by prefetching for performance.
+    ds_train = ds_train.map(normalize_img, num_parallel_calls=tf.data.AUTOTUNE)
+    ds_train = ds_train.cache()
+    ds_train = ds_train.shuffle(ds_info.splits['train'].num_examples)
+    ds_train = ds_train.batch(128)
+
+    # Build evaluation pipeline
+    ds_test = ds_test.map(normalize_img, num_parallel_calls=tf.data.AUTOTUNE)
+    ds_test = ds_test.batch(128)
+    ds_test = ds_test.cache()
+
+    # Create TensorFlow Iterator object and wrap it in a generator
+    itr_train = make_iterator(ds_train)
+    itr_valid = make_iterator(ds_test)
 
     # Instantiate the tuner and perform hypertuning. This will get optimal hyperparameters for the model.
     tuner = kt.Hyperband(
@@ -78,10 +118,9 @@ def main():
         project_name='introduction')
 
     tuner.search(
-        x_train, 
-        y_train, 
-        epochs=50, 
-        validation_split=0.2, 
+        itr_train,
+        validation_data=itr_valid,
+        epochs=50,  
         callbacks=callbacks)
 
     best_hps=tuner.get_best_hyperparameters(num_trials=1)[0]
@@ -94,7 +133,7 @@ def main():
     hypermodel = tuner.hypermodel.build(best_hps)
 
     # Train the model on the data for 50 epochs and find best # of epochs
-    history = hypermodel.fit(x_train, y_train, epochs=50, validation_split=0.2)
+    history = hypermodel.fit(itr_train, epochs=50, validation_data=itr_valid)
 
     val_acc_per_epoch = history.history['val_accuracy']
     best_epoch = val_acc_per_epoch.index(max(val_acc_per_epoch)) + 1
@@ -102,10 +141,10 @@ def main():
 
     # Re-instantiate the hypermodel and train it with the optimal number of epochs from above
     hypermodel = tuner.hypermodel.build(best_hps)
-    hypermodel.fit(x_train, y_train, epochs=best_epoch, validation_split=0.2)
+    hypermodel.fit(itr_train, epochs=best_epoch, validation_data=itr_valid)
 
     # Evaluate the hypermodel on the test data
-    eval_result = hypermodel.evaluate(x_test, y_test)
+    eval_result = hypermodel.evaluate(itr_valid)
     print("These are the results for best model [test loss, test accuracy]:", eval_result)
 
 #
