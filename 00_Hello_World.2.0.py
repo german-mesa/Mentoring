@@ -10,6 +10,9 @@ print("TensorFlow version:", tf.__version__, "\n")
 import numpy as np
 import matplotlib.pyplot as plt
 
+# Global parameters
+NUM_EVALUATIONS = 10
+TRAIN_BATCH_SIZE = 128
 
 #
 # Early cancellation when reached certain level of accuracy
@@ -63,12 +66,12 @@ def main():
     ds_train = ds_train.map(normalize_img, num_parallel_calls=tf.data.AUTOTUNE)
     ds_train = ds_train.cache()
     ds_train = ds_train.shuffle(ds_info.splits['train'].num_examples)
-    ds_train = ds_train.batch(128)
+    ds_train = ds_train.batch(TRAIN_BATCH_SIZE)
     ds_train = ds_train.prefetch(tf.data.AUTOTUNE)
 
     # Build evaluation pipeline
     ds_test = ds_test.map(normalize_img, num_parallel_calls=tf.data.AUTOTUNE)
-    ds_test = ds_test.batch(128)
+    ds_test = ds_test.batch(TRAIN_BATCH_SIZE)
     ds_test = ds_test.cache()
     ds_test = ds_test.prefetch(tf.data.AUTOTUNE)
 
@@ -96,7 +99,8 @@ def main():
     # Fit the model
     history =  model.fit(
         ds_train,
-        epochs=10,
+        steps_per_epoch=ds_info.splits['train'].num_examples // (TRAIN_BATCH_SIZE *  NUM_EVALUATIONS),
+        epochs=NUM_EVALUATIONS,
         validation_data=ds_test,
         callbacks=callbacks
     )

@@ -10,6 +10,9 @@ print("TensorFlow version:", tf.__version__, "\n")
 import os
 import numpy as np
 
+# Global parameters
+TRAIN_BATCH_SIZE = 128
+
 # Image categories
 class_names = [
     'Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine']
@@ -45,7 +48,7 @@ def main():
     # - tf.data.Dataset.batch   : Batch elements of the dataset after shuffling to get unique batches at each epoch.
     # - tf.data.Dataset.prefetch: It is good practice to end the pipeline by prefetching for performance.
     ds_test = ds_test.map(normalize_img, num_parallel_calls=tf.data.AUTOTUNE)
-    ds_test = ds_test.batch(128)
+    ds_test = ds_test.batch(TRAIN_BATCH_SIZE)
     ds_test = ds_test.cache()
     ds_test = ds_test.prefetch(tf.data.AUTOTUNE)
 
@@ -54,7 +57,7 @@ def main():
  
     # Predictions over test image dataset
     probability_model = tf.keras.Sequential([model, tf.keras.layers.Softmax()])
-    predictions = model.predict(ds_test, batch_size=128)
+    predictions = model.predict(ds_test, batch_size=TRAIN_BATCH_SIZE)
 
     for prediction in predictions:
         print(f"Predicted value is {tf.math.argmax(prediction)}")
