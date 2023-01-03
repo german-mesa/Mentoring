@@ -1,0 +1,6 @@
+Welcome to the collaboration area...
+
+- You have to install your GIT environment in your laptop. There are good references for GIT extension for VS Code. Remember to create your .gitignore file to avoid pushing unwanted folders to the container.
+- Create your venv environment. VS Code helps you to do that.
+- Get the 00_Hello_World.py and make it yours. Maybe you'll need to install some libraries ;-)
+
